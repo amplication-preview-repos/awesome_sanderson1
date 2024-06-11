@@ -1,0 +1,75 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Menu {
+  createdAt    DateTime    @default(now())
+  description  String?
+  id           String      @id @default(cuid())
+  name         String?
+  orderItems   OrderItem[]
+  price        Float?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId String?
+  updatedAt    DateTime    @updatedAt
+}
+
+model Restaurant {
+  address       String?
+  contactNumber String?
+  createdAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  menus         Menu[]
+  name          String?
+  orders        Order[]
+  updatedAt     DateTime @updatedAt
+}
+
+model OrderItem {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  menu      Menu?    @relation(fields: [menuId], references: [id])
+  menuId    String?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
+  quantity  Int?
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  createdAt    DateTime         @default(now())
+  id           String           @id @default(cuid())
+  orderDate    DateTime?
+  orderItems   OrderItem[]
+  restaurant   Restaurant?      @relation(fields: [restaurantId], references: [id])
+  restaurantId String?
+  status       EnumOrderStatus?
+  totalAmount  Float?
+  updatedAt    DateTime         @updatedAt
+  user         User?            @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model User {
+  address     String?
+  createdAt   DateTime @default(now())
+  email       String?  @unique
+  firstName   String?
+  id          String   @id @default(cuid())
+  lastName    String?
+  orders      Order[]
+  password    String
+  phoneNumber String?
+  roles       Json
+  updatedAt   DateTime @updatedAt
+  username    String   @unique
+}
+
+enum EnumOrderStatus {
+  Option1
+}
